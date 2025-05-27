@@ -1,13 +1,19 @@
-from setuptools import find_packages
-from setuptools import setup
+from setuptools import find_packages, setup
+import os
 
 REQUIRES = []
+
 try:
-    with open("requirements.txt", "rb") as f:
-        REQUIRES = [line.strip() for line in f.read().decode("utf-8").split("\n")]
-        REQUIRES = [line for line in REQUIRES if "#" not in line]
-except FileNotFoundError as myEx:
-    raise Exception(myEx)
+    with open("requirements.txt", "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            REQUIRES.append(line.split("#")[0].strip())  # Remove inline comments
+except FileNotFoundError:
+    print("[setup.py] WARNING: requirements.txt not found. No dependencies will be installed.")
+except Exception as e:
+    print(f"[setup.py] ERROR reading requirements.txt: {e}")
 
 setup(
     name="finrl-meta",
@@ -17,9 +23,9 @@ setup(
     url="https://github.com/AI4Finance-Foundation/FinRL-Meta",
     license="MIT",
     install_requires=REQUIRES,
-    description="FinRL­-Meta: A Universe of ­ Market En­vironments for Data­-Driven Financial Reinforcement Learning",
+    description="FinRL­-Meta: A Universe of ­Market Environments for Data­-Driven Financial Reinforcement Learning",
     packages=find_packages(),
-    long_description="FinRL­-Meta: A Universe of Near Real­ Market En­vironments for Data­-Driven Financial Reinforcement Learning",
+    long_description="FinRL­-Meta: A Universe of Near Real­ Market Environments for Data­-Driven Financial Reinforcement Learning",
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
@@ -32,7 +38,7 @@ setup(
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
     ],
-    keywords="Reinforcment Learning",
-    platform=["any"],
+    keywords="Reinforcement Learning",
+    platforms=["any"],
     python_requires=">=3.6",
 )

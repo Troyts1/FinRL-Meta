@@ -1,10 +1,13 @@
-# dir
+import os
+import sys
+
+# Directory Constants
 DATA_SAVE_DIR = "datasets"
 TRAINED_MODEL_DIR = "trained_models"
 TENSORBOARD_LOG_DIR = "tensorboard_log"
 RESULTS_DIR = "results"
 
-# date format: '%Y-%m-%d'
+# Date Ranges
 TRAIN_START_DATE = "2014-01-01"
 TRAIN_END_DATE = "2020-07-31"
 
@@ -14,8 +17,19 @@ TEST_END_DATE = "2021-10-01"
 TRADE_START_DATE = "2021-11-01"
 TRADE_END_DATE = "2021-12-01"
 
-# stockstats technical indicator column names
-# check https://pypi.org/project/stockstats/ for different names
+# Validate Dates
+for date_name, value in {
+    "TRAIN_START_DATE": TRAIN_START_DATE,
+    "TRAIN_END_DATE": TRAIN_END_DATE,
+    "TEST_START_DATE": TEST_START_DATE,
+    "TEST_END_DATE": TEST_END_DATE,
+    "TRADE_START_DATE": TRADE_START_DATE,
+    "TRADE_END_DATE": TRADE_END_DATE,
+}.items():
+    if not isinstance(value, str) or len(value) != 10:
+        print(f"[WARNING] {date_name} is not properly formatted: {value}")
+
+# Indicators (must match stockstats naming)
 INDICATORS = [
     "macd",
     "boll_ub",
@@ -26,7 +40,6 @@ INDICATORS = [
     "close_30_sma",
     "close_60_sma",
 ]
-
 
 # Model Parameters
 A2C_PARAMS = {"n_steps": 5, "ent_coef": 0.01, "learning_rate": 0.0007}
@@ -60,18 +73,28 @@ ERL_PARAMS = {
 }
 RLlib_PARAMS = {"lr": 5e-5, "train_batch_size": 500, "gamma": 0.99}
 
+# Timezones
+TIME_ZONE_SHANGHAI = "Asia/Shanghai"
+TIME_ZONE_USEASTERN = "US/Eastern"
+TIME_ZONE_PARIS = "Europe/Paris"
+TIME_ZONE_BERLIN = "Europe/Berlin"
+TIME_ZONE_JAKARTA = "Asia/Jakarta"
+TIME_ZONE_SELFDEFINED = "xxx"
+USE_TIME_ZONE_SELFDEFINED = 0  # 0 = use default, 1 = use custom
 
-# Possible time zones
-TIME_ZONE_SHANGHAI = "Asia/Shanghai"  # Hang Seng HSI, SSE, CSI
-TIME_ZONE_USEASTERN = "US/Eastern"  # Dow, Nasdaq, SP
-TIME_ZONE_PARIS = "Europe/Paris"  # CAC,
-TIME_ZONE_BERLIN = "Europe/Berlin"  # DAX, TECDAX, MDAX, SDAX
-TIME_ZONE_JAKARTA = "Asia/Jakarta"  # LQ45
-TIME_ZONE_SELFDEFINED = "xxx"  # If neither of the above is your time zone, you should define it, and set USE_TIME_ZONE_SELFDEFINED 1.
-USE_TIME_ZONE_SELFDEFINED = 0  # 0 (default) or 1 (use the self defined)
+# Timezone check
+try:
+    import pytz
 
-# parameters for data sources
-ALPACA_API_KEY = "xxx"  # your ALPACA_API_KEY
-ALPACA_API_SECRET = "xxx"  # your ALPACA_API_SECRET
-ALPACA_API_BASE_URL = "https://paper-api.alpaca.markets"  # alpaca url
-BINANCE_BASE_URL = "https://data.binance.vision/"  # binance url
+    if USE_TIME_ZONE_SELFDEFINED:
+        if TIME_ZONE_SELFDEFINED not in pytz.all_timezones:
+            print(f"[WARNING] Custom time zone '{TIME_ZONE_SELFDEFINED}' is invalid.")
+except ImportError:
+    print("[WARNING] pytz module not found. Time zone validation skipped.")
+
+# API Keys (fallback placeholders)
+ALPACA_API_KEY = os.getenv("ALPACA_API_KEY", "xxx")
+ALPACA_API_SECRET = os.getenv("ALPACA_API_SECRET", "xxx")
+ALPACA_API_BASE_URL = os.getenv("ALPACA_API_BASE_URL", "https://paper-api.alpaca.markets")
+
+BINANCE_BASE_URL = os.getenv("BINANCE_BASE_URL", "https://data.binance.vision/")
